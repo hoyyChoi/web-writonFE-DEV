@@ -74,30 +74,24 @@ const MainPage = () => {
       document.body.style.overflowY = "scroll";
     }
   };
+
+  const handleTouch = () => {
+    if (isTouchDevice && Notification.permission === "default") {
+      notificationPermission(); // 알림 요청 실행
+    }
+  };
+
   // 터치 이벤트 감지 로직
   useEffect(() => {
     if (isPWA() && isTouchDevice) {
-      const handleTouch = () => {
-        if (Notification.permission === "default") {
-          notificationPermission(); // 알림 요청 실행
-        }
-        document.removeEventListener("touchstart", handleTouch); // 이벤트 제거
-      };
-
-      // 터치 이벤트 리스너 등록
-      document.addEventListener("touchstart", handleTouch);
-
-      // 컴포넌트 언마운트 시 이벤트 정리
-      return () => {
-        document.removeEventListener("touchstart", handleTouch);
-      };
+      notificationPermission(); // 알림 요청 실행
     }
   }, []);
 
   if (!ChallengeCurrent) return <></>;
 
   return (
-    <Container>
+    <Container onTouchStart={() => handleTouch()}>
       <ProgressBox ChallengeCurrent={ChallengeCurrent} />
       <Calendar
         CalendarData={CalendarData?.length === 0 ? mainCalendarDummyData : CalendarData}
