@@ -74,9 +74,12 @@ const MainPage = () => {
   };
   // 푸시알림 허용 창 띄우기 로직
   useEffect(() => {
+    alert("let's go");
     if (isPWA() && isTouchDevice) {
+      alert("푸시알림을 허용해주세요");
       notificationPermission();
     }
+    alert("let's go344");
   }, []);
 
   if (!ChallengeCurrent) return <></>;
