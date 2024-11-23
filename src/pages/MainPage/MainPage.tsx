@@ -72,15 +72,24 @@ const MainPage = () => {
       document.body.style.overflowY = "scroll";
     }
   };
-  // 푸시알림 허용 창 띄우기 로직
+  // 터치 이벤트 감지 로직
   useEffect(() => {
-    alert("let's go");
     if (isPWA() && isTouchDevice) {
-      alert("푸시알림을 허용해주세요");
-      notificationPermission();
+      const handleTouch = () => {
+        if (Notification.permission === "default") {
+          notificationPermission(); // 알림 요청 실행
+        }
+        document.removeEventListener("touchstart", handleTouch); // 이벤트 제거
+      };
+
+      // 터치 이벤트 리스너 등록
+      document.addEventListener("touchstart", handleTouch);
+
+      // 컴포넌트 언마운트 시 이벤트 정리
+      return () => {
+        document.removeEventListener("touchstart", handleTouch);
+      };
     }
-    alert("let's go344");
-    alert(Notification.permission);
   }, []);
 
   if (!ChallengeCurrent) return <></>;
