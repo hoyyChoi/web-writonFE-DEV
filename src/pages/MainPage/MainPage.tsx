@@ -59,6 +59,8 @@ const MainPage = () => {
     setIsLoading(true);
     try {
       const notificationResult = await handleAllowNotification();
+      alert(notificationResult);
+      alert(Notification.permission);
       if (notificationResult === "granted") {
         setIsLoading(false);
         document.body.style.overflowY = "scroll"; // granted의 로딩 후에 실행
