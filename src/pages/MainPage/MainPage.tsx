@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 
 import { Calendar } from "@/components/MainPage/Calendar";
@@ -14,17 +14,15 @@ import {
   useGetChallengeCurrent,
   useGetRetrospectCurrent,
 } from "@/hooks/reactQueryHooks/useMainHooks";
-import { finishModalState, loadingState, snackBarState } from "@/recoil/atoms";
+import { finishModalState, modalBackgroundState } from "@/recoil/atoms";
 import { dateCheck } from "@/hooks/useDateCheck";
 import { useEffect } from "react";
-import { handleAllowNotification } from "@/core/notification/notificationFunc";
 
 const MainPage = () => {
   const navigate = useNavigate();
   const today = format(new Date(), "yyyy-MM-dd");
   const setFinishModal = useSetRecoilState(finishModalState);
-  const [snackBar, setSnackBar] = useRecoilState(snackBarState);
-  const setIsLoading = useSetRecoilState(loadingState);
+  const setModal = useSetRecoilState(modalBackgroundState);
 
   const organizationChallengeData = {
     organization: localStorage.getItem("organization") as string,
@@ -54,44 +52,17 @@ const MainPage = () => {
   //모바일일때만 푸시알림 허용 창 띄우기
   const isTouchDevice = "ontouchstart" in window;
 
-  const notificationPermission = async () => {
-    document.body.style.overflowY = "hidden";
-    setIsLoading(true);
-    try {
-      const notificationResult = await handleAllowNotification();
-      alert(notificationResult);
-      alert(Notification.permission);
-      if (notificationResult === "granted") {
-        setIsLoading(false);
-        document.body.style.overflowY = "scroll"; // granted의 로딩 후에 실행
-        setSnackBar({ ...snackBar, notificationSnackBar: true });
-        setTimeout(() => {
-          setSnackBar({ ...snackBar, notificationSnackBar: false });
-        }, 2000);
-      }
-    } finally {
-      setIsLoading(false);
-      document.body.style.overflowY = "scroll";
-    }
-  };
-
-  const handleTouch = () => {
-    if (isTouchDevice && Notification.permission === "default") {
-      notificationPermission(); // 알림 요청 실행
-    }
-  };
-
   // 터치 이벤트 감지 로직
   useEffect(() => {
-    if (isPWA() && isTouchDevice) {
-      notificationPermission(); // 알림 요청 실행
+    if (Notification.permission === "default" && isPWA() && isTouchDevice) {
+      setModal((modal) => ({ ...modal, notificationPermissionModal: true }));
     }
   }, []);
 
   if (!ChallengeCurrent) return <></>;
 
   return (
-    <Container onTouchStart={() => handleTouch()}>
+    <Container>
       <ProgressBox ChallengeCurrent={ChallengeCurrent} />
       <Calendar
         CalendarData={CalendarData?.length === 0 ? mainCalendarDummyData : CalendarData}
