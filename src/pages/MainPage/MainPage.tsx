@@ -80,6 +80,7 @@ const MainPage = () => {
       notificationPermission();
     }
     alert("let's go344");
+    alert(Notification.permission);
   }, []);
 
   if (!ChallengeCurrent) return <></>;
